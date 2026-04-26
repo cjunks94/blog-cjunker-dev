@@ -1,0 +1,112 @@
+/* ==========================================================================
+   ARTICLE STYLES — Optimized for reading
+   ========================================================================== */
+
+.article-content {
+    max-width: 68ch;
+    margin: 0 auto;
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+}
+
+.article-content p {
+    margin-bottom: var(--space-lg);
+}
+
+.article-content h2 {
+    margin-top: var(--space-3xl);
+    margin-bottom: var(--space-md);
+    padding-top: var(--space-lg);
+    border-top: var(--border-thin) solid var(--c-border);
+}
+
+.article-content h3 {
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-sm);
+}
+
+.article-content h4 {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-xs);
+}
+
+/* Code blocks */
+.article-content pre {
+    background: var(--c-surface);
+    border: var(--border-thick) solid var(--c-border);
+    box-shadow: var(--shadow-sm) var(--c-shadow);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    margin: var(--space-xl) 0;
+}
+
+.article-content code:not(pre code) {
+    background: var(--c-surface-alt);
+    padding: 0.15em 0.4em;
+    border: 1px solid var(--c-border);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+}
+
+/* Blockquotes */
+.article-content blockquote {
+    border-left: var(--border-thick) solid var(--c-accent);
+    padding-left: var(--space-lg);
+    margin: var(--space-xl) 0;
+    font-style: italic;
+    color: var(--c-ink-light);
+}
+
+/* Lists */
+.article-content ul,
+.article-content ol {
+    margin-bottom: var(--space-lg);
+}
+
+.article-content li {
+    margin-bottom: var(--space-xs);
+}
+
+/* Tables */
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-xl) 0;
+    font-size: var(--text-base);
+}
+
+.article-content th,
+.article-content td {
+    padding: var(--space-sm) var(--space-md);
+    border: var(--border-thin) solid var(--c-border);
+    text-align: left;
+}
+
+.article-content th {
+    background: var(--c-surface-alt);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* Images */
+.article-content img {
+    border: var(--border-thick) solid var(--c-border);
+    box-shadow: var(--shadow-sm) var(--c-shadow);
+    margin: var(--space-xl) 0;
+}
+
+/* Horizontal rules */
+.article-content hr {
+    border: none;
+    border-top: var(--border-thick) solid var(--c-border);
+    margin: var(--space-3xl) 0;
+}
+
+/* Strong emphasis */
+.article-content strong {
+    font-weight: 700;
+}

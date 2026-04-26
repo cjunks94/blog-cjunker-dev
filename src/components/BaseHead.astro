@@ -1,0 +1,46 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  ogType?: string;
+  publishedDate?: Date;
+  tags?: string[];
+}
+
+const { title, description, ogType = 'website', publishedDate, tags } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content={description} />
+<meta name="author" content="Christopher Junker" />
+
+<title>{title}</title>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="canonical" href={canonicalURL} />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="application/rss+xml" title="Christopher Junker's Blog" href="/rss.xml" />
+
+<!-- Open Graph -->
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:site_name" content="Christopher Junker's Blog" />
+
+{publishedDate && (
+  <meta property="article:published_time" content={publishedDate.toISOString()} />
+)}
+{tags && tags.length > 0 && (
+  <meta property="article:tag" content={tags.join(', ')} />
+)}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+
+<!-- Umami Analytics (replace WEBSITE_ID after registering in Umami dashboard) -->
+<script defer src="https://umami-tracking.cjunker.dev/script.js" data-website-id="REPLACE_WITH_BLOG_WEBSITE_ID"></script>

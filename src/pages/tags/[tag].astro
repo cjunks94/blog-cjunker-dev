@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = new Set<string>();
+  posts.forEach(post => post.data.tags.forEach(tag => tags.add(tag)));
+
+  return [...tags].map(tag => ({
+    params: { tag },
+    props: {
+      posts: posts
+        .filter(post => post.data.tags.includes(tag))
+        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`${tag} | CJ Blog`}
+  description={`Posts tagged with "${tag}".`}
+>
+  <div class="tag-page">
+    <header class="tag-header">
+      <a href="/tags" class="back-to-tags">All Tags</a>
+      <h1>{tag}</h1>
+      <p class="tag-count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
+    </header>
+
+    <div class="posts-list">
+      {posts.map(post => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={post.id.replace(/\.(md|mdx)$/, '')}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .tag-header {
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: var(--border-thick) solid var(--c-border);
+  }
+
+  .back-to-tags {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--c-ink-light);
+    display: inline-block;
+    margin-bottom: var(--space-sm);
+  }
+
+  .tag-count {
+    color: var(--c-ink-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+</style>

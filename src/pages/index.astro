@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout
+  title="Christopher Junker | Blog"
+  description="Technical writing on distributed systems, observability, and software engineering."
+>
+  <div class="blog-index">
+    <header class="blog-header">
+      <h1>Blog</h1>
+      <p class="blog-subtitle">
+        Engineering notes on distributed systems, observability, and building things that work.
+      </p>
+    </header>
+
+    <div class="posts-list">
+      {posts.map(post => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={post.id.replace(/\.(md|mdx)$/, '')}
+        />
+      ))}
+    </div>
+
+    {posts.length === 0 && (
+      <p class="empty-state">No posts yet. Check back soon.</p>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-index {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .blog-header {
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: var(--border-thick) solid var(--c-border);
+  }
+
+  .blog-header h1 {
+    margin-bottom: var(--space-sm);
+  }
+
+  .blog-subtitle {
+    color: var(--c-ink-light);
+    font-size: var(--text-lg);
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .empty-state {
+    color: var(--c-ink-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    text-align: center;
+    padding: var(--space-3xl);
+  }
+</style>

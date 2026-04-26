@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const tagMap = new Map<string, number>();
+posts.forEach(post => {
+  post.data.tags.forEach(tag => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<BaseLayout
+  title="Tags | CJ Blog"
+  description="Browse posts by topic."
+>
+  <div class="tags-index">
+    <header class="tags-header">
+      <h1>Tags</h1>
+    </header>
+
+    <div class="tags-grid">
+      {tags.map(([tag, count]) => (
+        <a href={`/tags/${tag}`} class="tag-card">
+          <span class="tag-name">{tag}</span>
+          <span class="tag-count">{count}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tags-index {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .tags-header {
+    margin-bottom: var(--space-2xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: var(--border-thick) solid var(--c-border);
+  }
+
+  .tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .tag-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--c-ink);
+    text-decoration: none;
+    padding: var(--space-xs) var(--space-md);
+    border: var(--border-thick) solid var(--c-border);
+    box-shadow: var(--shadow-sm) var(--c-shadow);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .tag-card:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--c-shadow);
+    color: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+
+  .tag-count {
+    font-size: var(--text-xs);
+    color: var(--c-ink-muted);
+  }
+</style>

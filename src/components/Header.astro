@@ -1,0 +1,90 @@
+---
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="header-content">
+    <a href="https://cjunker.dev" class="brand" rel="noopener">CJ</a>
+    <nav aria-label="Blog navigation">
+      <ul class="nav-list">
+        <li><a href="/" class:list={[{ active: currentPath === '/' }]}>Posts</a></li>
+        <li><a href="/tags" class:list={[{ active: currentPath.startsWith('/tags') }]}>Tags</a></li>
+        <li><a href="/rss.xml">RSS</a></li>
+        <li><a href="https://cjunker.dev" rel="noopener">Portfolio</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: var(--c-surface);
+    border-bottom: var(--border-thick) solid var(--c-border);
+    box-shadow: 0 var(--border-thick) 0 var(--c-shadow);
+  }
+
+  .header-content {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--space-sm) var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--c-accent);
+    text-decoration: none;
+    border: var(--border-thick) solid var(--c-accent);
+    padding: var(--space-2xs) var(--space-sm);
+  }
+
+  .brand:hover {
+    background: var(--c-accent);
+    color: var(--c-surface);
+  }
+
+  .nav-list {
+    display: flex;
+    list-style: none;
+    gap: var(--space-xs);
+    padding: 0;
+  }
+
+  .nav-list a {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--c-ink);
+    text-decoration: none;
+    padding: var(--space-xs) var(--space-sm);
+    border: var(--border-thin) solid transparent;
+    transition: all var(--transition-normal);
+  }
+
+  .nav-list a:hover,
+  .nav-list a.active {
+    border-color: var(--c-border);
+    background: var(--c-surface-alt);
+  }
+
+  @media (max-width: 480px) {
+    .header-content {
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .nav-list {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+</style>

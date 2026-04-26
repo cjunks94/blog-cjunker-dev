@@ -1,0 +1,90 @@
+/* ==========================================================================
+   DESIGN TOKENS — Shared identity with cjunker.dev portfolio
+
+   Copied from portfolio's base.css + themes/variables.css (forest theme).
+   These can diverge independently — no external dependency.
+   ========================================================================== */
+
+:root {
+    /* === COLORS (Forest Theme) === */
+    --c-accent: #3D6649;
+    --c-accent-hover: #2d4d37;
+    --c-accent-light: #4a7a58;
+
+    --c-bg: #f4f1de;
+    --c-surface: #ffffff;
+    --c-surface-alt: #f9f8f3;
+
+    --c-ink: #121212;
+    --c-ink-light: #5e5e5e;
+    --c-ink-muted: #888888;
+
+    --c-border: #5e5e5e;
+    --c-shadow: #121212;
+
+    --c-success: #3D6649;
+    --c-error: #D9534F;
+    --c-warning: #E8A838;
+    --c-info: #5B9BD5;
+
+    /* === TYPOGRAPHY === */
+    --font-mono: 'Courier New', Courier, monospace;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+
+    --leading-tight: 1.25;
+    --leading-normal: 1.6;
+    --leading-relaxed: 1.75;
+
+    --tracking-tight: -1px;
+
+    /* === BORDERS & SHADOWS (Brutalist) === */
+    --border-thick: 3px;
+    --border-thin: 2px;
+    --shadow-sm: 4px 4px 0;
+    --shadow-md: 6px 6px 0;
+
+    /* === SPACING === */
+    --space-2xs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    --container-max: 1200px;
+
+    /* === TRANSITIONS === */
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.2s ease;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --c-accent: #6aad7b;
+        --c-accent-hover: #8ec49b;
+        --c-accent-light: #4a7a58;
+
+        --c-bg: #1a1a1a;
+        --c-surface: #242424;
+        --c-surface-alt: #2e2e2e;
+
+        --c-ink: #e0e0e0;
+        --c-ink-light: #a0a0a0;
+        --c-ink-muted: #6e6e6e;
+
+        --c-border: #404040;
+        --c-shadow: #0a0a0a;
+    }
+}

@@ -1,0 +1,16 @@
+// @ts-check
+import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://blog.cjunker.dev',
+  integrations: [mdx(), sitemap()],
+  output: 'static',
+  markdown: {
+    shikiConfig: {
+      theme: 'github-dark',
+      wrap: true,
+    },
+  },
+});
