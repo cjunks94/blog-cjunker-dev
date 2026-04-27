@@ -119,3 +119,48 @@ Phase 4 — Jenkins → GitHub Actions with self-hosted runner
 - How does this connect to the worker state problem from post 1?
 
 **Draft status:** Not started
+
+---
+
+## 6. When your source of truth isn't
+
+**Angle:** What happens when two systems both think they own the data. Reconciliation as an ongoing architectural pattern, not a one-time migration.
+
+**Your experience:**
+- Salesforce sync with internal systems — bidirectional data flow
+- Sidekiq jobs polling and reconciling drift in sensitive partner data
+- Orchestration-like components: scheduled reconciliation, conflict detection
+- Partner data (70+ partners) where inconsistency has real business consequences
+
+**Questions to answer:**
+- What's the reconciliation loop? Poll, compare, resolve — or something more nuanced?
+- How do you detect drift? Checksums, timestamps, field-level diffing?
+- What happens when both sides changed? Who wins and how do you decide?
+- How often does reconciliation run and what triggers it?
+- What's the blast radius when reconciliation gets it wrong?
+- How does this relate to the "stateful jobs / stateless workers" principle from post 1?
+
+**Draft status:** Not started
+
+---
+
+## 7. Migrating a payments database (twice)
+
+**Angle:** Two different migrations, two different target databases, same source. What you learn about data migration when the data is payments and you can't afford to lose a row.
+
+**Your experience:**
+- Mongo → MySQL migration
+- Mongo → DocumentDB migration
+- Payments data — PCI sensitivity, can't tolerate data loss or corruption
+- Two migrations means you learned from the first one (or didn't)
+
+**Questions to answer:**
+- Why two migrations? What drove each decision? (MySQL for X, DocDB for Y?)
+- What was the cutover strategy? Dual-write? Shadow reads? Big bang?
+- How did you validate data integrity post-migration? Row counts, checksums, reconciliation?
+- What broke or almost broke?
+- What's different about migrating payments data vs. anything else? (PCI, audit trails, idempotency)
+- Did the first migration inform the second? What did you do differently?
+- How long did each take, and what determined the timeline?
+
+**Draft status:** Not started
