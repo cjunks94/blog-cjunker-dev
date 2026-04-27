@@ -1,4 +1,6 @@
 ---
+import { tagSlug } from '../utils/slug';
+
 interface Props {
   tags: string[];
 }
@@ -8,7 +10,7 @@ const { tags } = Astro.props;
 
 <div class="tag-list">
   {tags.map(tag => (
-    <a href={`/tags/${tag}`} class="tag">{tag}</a>
+    <a href={`/tags/${tagSlug(tag)}`} class="tag">{tag}</a>
   ))}
 </div>
 

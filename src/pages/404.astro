@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="404 | CJ Blog"
+  description="The page you were looking for could not be found."
+>
+  <div class="not-found">
+    <p class="status-code">404</p>
+    <h1>Page Not Found</h1>
+    <p class="message">
+      That URL doesn't match anything here. The post may have been moved or
+      retired.
+    </p>
+    <div class="actions">
+      <a href="/" class="action-link">All Posts</a>
+      <a href="/tags" class="action-link">Browse Tags</a>
+      <a href="https://cjunker.dev" class="action-link" rel="noopener">Portfolio</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-lg);
+    text-align: center;
+  }
+
+  .status-code {
+    font-family: var(--font-mono);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--c-accent);
+    margin-bottom: var(--space-md);
+  }
+
+  .message {
+    color: var(--c-ink-light);
+    font-size: var(--text-lg);
+    margin: var(--space-lg) 0 var(--space-2xl);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .action-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--c-ink);
+    text-decoration: none;
+    padding: var(--space-xs) var(--space-md);
+    border: var(--border-thick) solid var(--c-border);
+    box-shadow: var(--shadow-sm) var(--c-shadow);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .action-link:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--c-shadow);
+    color: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+</style>
