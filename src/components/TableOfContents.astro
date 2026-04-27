@@ -9,7 +9,7 @@ const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 
 {filteredHeadings.length > 0 && (
   <nav class="toc" aria-label="Table of contents">
-    <details open>
+    <details>
       <summary class="toc-title">Contents</summary>
       <ol class="toc-list">
         {filteredHeadings.map(heading => (
