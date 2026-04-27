@@ -9,7 +9,6 @@ const currentPath = Astro.url.pathname;
       <ul class="nav-list">
         <li><a href="/" class:list={[{ active: currentPath === '/' }]}>Posts</a></li>
         <li><a href="/tags" class:list={[{ active: currentPath.startsWith('/tags') }]}>Tags</a></li>
-        <li><a href="/rss.xml">RSS</a></li>
         <li><a href="https://cjunker.dev" rel="noopener">Portfolio</a></li>
       </ul>
     </nav>
