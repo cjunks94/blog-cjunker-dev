@@ -1,0 +1,53 @@
+---
+title: "When your test suite is the bottleneck"
+description: "105 minutes to 16. Four attempts, four tradeoffs, and what slow CI actually costs a team."
+date: 2026-04-27
+tags: ["ci", "testing", "infrastructure", "leadership"]
+draft: false
+---
+
+### Phase 1: Getting started
+
+When I joined my first enterprise team in a professional setting I was pretty clueless what I should be doing. Yes, we had a Kanban board with some well defined tickets but even the best ticket is useless when you have no knowledge of the system it pertains to. From school and my mentors before this I had TDD and BDD drilled into my head as maybe the only way to develop. So I did what I knew and read through these tests, identified gaps, created my own tickets, and went to work.
+
+Our CI pipeline took 105 minutes. The bug I fixed was one small file inside an entire Rails monolithic application.
+
+I immediately felt defeated. Worth noting this was around the time the M1 MacBooks were breaking onto the scene so I was also defeated locally configuring my Docker instance. What do I do now? PRs stacked up. Reviews felt heavy already but now I was missing my own red/green checks too. People started bypass-merging to master. Our deployment process made that less risky than it sounds, but it was still a team skipping a gate because the gate was too slow to be useful.
+
+### Phase 2: parallel_tests boogaloo
+
+The first bottleneck was the Jenkins instance itself. Unit tests, JS tests and all our other specs were running serially on shared infrastructure alongside deployments and other non-prod jobs.
+
+I wrote custom code to run our Cucumber tests in parallel and spun up a dedicated Jenkins agent instance to separate test runs from everything else. Times came down.
+
+But parallel tests against a shared database introduced a new problem: inter-job DB pollution. Specifically, our API tests were leaving state behind that other test processes would pick up. One test's setup was another test's false positive. We'd traded slow-and-reliable for faster-and-inconsistent. Not ideal.
+
+Instead of re-inventing the wheel, we replaced the homegrown parallelization with `parallel_tests`, a well-established gem with proper database handling.
+
+It helped. Runtime dropped roughly in half. But now flaky tests were the dominant problem. The kind of tests that pass 4 out of 5 times, fail on the 5th, and nobody can reproduce locally. We'd cut our runtime but needed reruns often enough that the net improvement was questionable.
+
+Half the time at twice the reruns isn't progress.
+
+### Phase 3: Selective parallelization
+
+We stopped trying to parallelize everything. The Cucumber suite was the flaky one. The RSpec tests were lightweight and robust.
+
+So we moved only the RSpec tests to parallel execution and left Cucumber running serially. It wasn't satisfying, it felt like giving up on half the suite and my first project on the team, but it was the first change that actually improved both speed and consistency at the same time.
+
+The lesson here was that not every test suite benefits from the same optimization. Parallelization is a tool, not a strategy.
+
+### Phase 4: Jenkins to GitHub Actions
+
+The biggest jump came from leaving Jenkins entirely. We migrated to GitHub Actions with a self-hosted runner. Same hardware, but we were able to upgrade dependencies that our dated Jenkins instance had been blocking. The jump to GHA also allowed us to have a sort of A/B testing, leaving our prod jobs intact on Jenkins until we were ready for the cutover.
+
+This was as much about killing tech debt as it was about CI speed. Cyber and DevOps had been pushing to deprecate Jenkins for a while so gaining their support and backing was painless. Our test suite migration gave the effort a concrete win that multiple stakeholders could point to.
+
+The result: massive runtime reduction, better reliability, and one less piece of legacy infrastructure for the security team to worry about.
+
+### What I'd tell someone at 105 minutes
+
+Start with what your team is actually doing, not what your pipeline is actually clocking. If people are bypass-merging, that's your signal. The number on the build is a symptom. The behavior change is the problem.
+
+Then: don't parallelize everything. Parallelize what's stable. Fix or isolate what's flaky. And if the infrastructure itself is the constraint, if you're blocked on upgrading dependencies because your CI platform is too old, that's not a test problem. That is a call for a platform migration, and it needs to be pitched as one.
+
+Every phase of this work solved one problem and surfaced the next. That's not failure. That's how infrastructure improvement and TDD actually works, one bottleneck at a time.
