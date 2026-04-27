@@ -1,0 +1,78 @@
+---
+title: "State or Stateless, that is the question."
+description: "Debugging some stateful workers."
+date: 2026-04-26
+tags: ["debug", "production", "state"]
+draft: false
+---
+
+### The setup
+
+Mid-migration from a single-tenant Salesforce instance to a large multi-org one. A critical piece of that migration was a data export tool.  Partners depended on this for their various data export/import jobs.
+We didn't have the bandwidth to keep owning it through the migration, so it got handed to another team with more capacity. The original plan was for us to advise. Over the course of the migration the advisory relationship shifted. We ended up further from the code than intended, and the week-by-week migration cadence meant changes to the export jobs landed faster than we could review them.
+At some point along the way, antipatterns crept in. The other team had added stateful behavior to the Celery workers.  Specifically, the workers were logging their own memory usage to the database, trying to figure out why Document export jobs were running out of memory and killing pods. The workers were assembling export files in memory before writing them out, which scaled badly with document size.
+I want to be clear that this was not carelessness. They had a real problem and it needed a visibility solution before next week's migration. The Document export jobs were OOM'ing pods, and reaching for "let's measure memory usage from inside the worker" is a natural instinct. The problem is happening during a run, and the Job config itself was tested, so the solution must live in the worker. I'll come back to why that instinct is wrong, but I want to name it first as the reasonable move it was.
+
+### The advice
+
+What I told them, on a few calls:
+
+Remove logging and DB writes from the worker service itself. That's not what the worker is there to do.
+Memory diagnostics live somewhere else. The Job model or a dedicated performance model, our Datadog dashboards, AWS pod metrics. The infrastructure already has answers to "is this pod running out of memory"; we should let it answer.
+The worker should be given inputs, do work, report results. Nothing more.
+
+The advice didn't fully land. It was the kind of advice that's hard to act on mid-migration when you're already firefighting.  Besides, the difference between the worker directly writing and the Job handling is a trivial difference in the short term. The team trial-and-errored their way through several iterations.
+
+I'm still not sure if the issue is fully fixed.
+
+### It got worse
+
+Before the in-worker memory logging, workers and pods occasionally restarted under memory pressure. Annoying, but recoverable.
+After, workers stopped restarting cleanly. Now they'd hang indefinitely until something forced a restart. And it got worse. The workers held the DB connection and potentially a Redis lock during the run, the hang blocked all subsequent jobs for that JobId. Killing the worker wasn't enough; now we had to manually clear the lock too.
+We'd traded one failure mode (occasional restart, automatic recovery) for a worse one: loss of visibility and held resources. The job was stuck in a state only a human could resolve. The DB row said running. The worker process was gone or unresponsive. The Redis lock was still held. Nothing in the current system could reconcile those facts on its own.
+The real shape of the failure didn't start just with OOM pods, it started when we added a state managing responsibility to otherwise state agnostic workers.
+
+### The principle I needed
+
+It was during these advisory conversations that I realized I was having trouble articulating what I actually wanted. I knew the in-worker logging was wrong. I knew memory monitoring belonged elsewhere. But I couldn't name the principle cleanly enough for it to land.
+The principle, I am writing down now because I couldn't say it then:
+Stateful jobs. Stateless workers. Durable side effects.
+Three pieces, three responsibilities!
+
+Jobs are stateful. Configuration, schedule, run history, status.  All in the database. The system's memory of what is happening lives here.
+Workers are stateless. They're given inputs, they do work, they report results. The workers hold nothing the system needs in order to clean up after them. This is what tripped us up.  The "report results" part felt like it gave workers permission to write state, when it really means "return output to the caller/Job."
+Side effects, exports to S3, files to SFTP, emails sent, go to durable destinations, and are written in ways the system can verify and recover.
+
+The memory-logging move violated the middle one. The worker was holding state!  The in-memory file build, the open DB connection, the Redis lock, and now also its own memory metrics. When the system hung we were stuck on cleanup duty for all of them.
+This isn't about Celery. It isn't about Rails. It isn't about Document exports. It's about the split. Any framework, any language, any job type.  The same shape applies.
+
+### The trap
+
+I want to spend a moment on why this pattern is so easy to fall into, because I don't think it was necessarily the team's fault. Most engineers reach for it, especially under time and business constraints.
+Workers are very tempting places to put logic, especially something like  a lightweight log. "Things that happen during a run" feel like they belong there:
+
+```
+Logs happen during a run → logging goes in the worker.
+Memory tracking happens at runtime → memory tracking goes in the worker
+Race checks happen at runtime → race-checking goes in the worker
+Export buffering happens during a run → buffers go in the worker
+```
+
+Every one of those feels obvious in the moment. Every one of them is an antipattern. The discipline is recognizing that "happens during a run" isn't the same as "belongs in the worker."
+
+### What I check now
+
+The main question I ask myself now is this: What is the worker holding that the system can't see?
+
+In our case, an in-memory file buffer, a DB connection held for the duration of the run, a Redis lock, and (eventually) a memory-usage metric being written from inside the worker. All invisible to the system if the worker died.
+
+The follow-ups matter too:
+- What survives the worker dying mid-execution? If the answer is "nothing," you have a recovery problem.
+- What happens if two workers run at once? If they step on each other, your side effects aren't idempotent.
+- What's idempotent and what isn't? If you can't rerun safely, your system can't self-heal.
+
+### What this post is for
+
+I'm writing this for two audiences. The first is me! I had trouble articulating this clearly when it mattered, and writing it down is how I make sure the next conversation goes better. The second is for those who come after.  I hope this helps you make the choice that is right for you.
+
+Stateful jobs. Stateless workers. Durable side effects.
