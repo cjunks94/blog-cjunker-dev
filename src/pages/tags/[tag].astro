@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
+import { tagSlug } from '../../utils/slug';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -9,8 +10,9 @@ export async function getStaticPaths() {
   posts.forEach(post => post.data.tags.forEach(tag => tags.add(tag)));
 
   return [...tags].map(tag => ({
-    params: { tag },
+    params: { tag: tagSlug(tag) },
     props: {
+      tag,
       posts: posts
         .filter(post => post.data.tags.includes(tag))
         .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
@@ -18,8 +20,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { tag } = Astro.params;
-const { posts } = Astro.props;
+const { tag, posts } = Astro.props;
 ---
 
 <BaseLayout

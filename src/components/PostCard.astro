@@ -1,4 +1,6 @@
 ---
+import { tagSlug } from '../utils/slug';
+
 interface Props {
   title: string;
   description: string;
@@ -27,7 +29,7 @@ const formattedDate = date.toLocaleDateString('en-US', {
     {tags.length > 0 && (
       <div class="post-tags">
         {tags.map(tag => (
-          <a href={`/tags/${tag}`} class="tag">{tag}</a>
+          <a href={`/tags/${tagSlug(tag)}`} class="tag">{tag}</a>
         ))}
       </div>
     )}
