@@ -5,10 +5,12 @@ interface Props {
   ogType?: string;
   publishedDate?: Date;
   tags?: string[];
+  image?: string;
 }
 
-const { title, description, ogType = 'website', publishedDate, tags } = Astro.props;
+const { title, description, ogType = 'website', publishedDate, tags, image = '/og-image.png' } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
 ---
 
 <meta charset="UTF-8" />
@@ -28,6 +30,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
+<meta property="og:image" content={imageURL} />
 <meta property="og:site_name" content="Christopher Junker's Blog" />
 
 {publishedDate && (
@@ -41,5 +44,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageURL} />
 
 <!-- Analytics: Umami paused. Re-enable when ready. -->
